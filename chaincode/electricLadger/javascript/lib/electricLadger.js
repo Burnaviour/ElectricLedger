@@ -39,6 +39,37 @@ class ElectricLadger extends Contract {
         console.info(allResults);
         return JSON.stringify(allResults);
     }
+    async queryData(ctx,units){
+        let queryString={};
+        queryString.selector={"units":units}
+        iterator=await ctx.stub.getQueryresult(JSON.stringify(queryString));
+        let result =tihs.iteratorData(iterator);
+        return JSON.stringify(result);
+
+
+    }
+    async iteratorData(iterator){
+        let resArray = [];
+
+        while(true){
+        let res=await iterator.next();
+        let response={};
+        if(res.value && res.value.value.toString()){
+            response.key=res.value.key;
+            response.value = JSON.parse(res.value.value.toString('utf8'));
+            resArray.push(response);
+
+        }
+        if (res.done) {
+            await iterator.close();
+            return resArray;
+            
+        }
+
+        }}
+
+
+    
 
 
 

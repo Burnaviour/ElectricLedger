@@ -12,6 +12,7 @@ const path = require('path');
 
 async function main() {
     try {
+        
         // load the network configuration
         const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
         let ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
@@ -64,7 +65,13 @@ async function main() {
             address:'clifton ',
             units:700
 
-           }
+           },
+           {
+            name:'muzafar',
+            address:'clifton ',
+            units:70
+
+           },
 
 
         ];

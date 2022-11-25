@@ -1,8 +1,4 @@
-/*
- * Copyright IBM Corp. All Rights Reserved.
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+
 
 'use strict';
 
@@ -13,6 +9,7 @@ const fs = require('fs');
 
 async function main() {
     try {
+        
         // load the network configuration
         const ccpPath = path.resolve(__dirname, '..', '..', 'test-network', 'organizations', 'peerOrganizations', 'org1.example.com', 'connection-org1.json');
         const ccp = JSON.parse(fs.readFileSync(ccpPath, 'utf8'));
@@ -48,11 +45,12 @@ async function main() {
         // console.log(`Transaction has been evaluated, result is: ${result2.toString()}`);
         // const result3 = await contract.evaluateTransaction('readData',"user3");
         // console.log(`Transaction has been evaluated, result is: ${result3.toString()}`);
-        const result = await contract.evaluateTransaction('queryAllData');
-        console.log(`Transaction has been evaluated, result is: ${result.toString()}`);
+        const result = await contract.evaluateTransaction('queryData','Ali');
+        console.log(`Transaction has been evaluated, result is: ${result.toString('utf-8')}`);
         
         // Disconnect from the gateway.
         await gateway.disconnect();
+        return ;
         
     } catch (error) {
         console.error(`Failed to evaluate transaction: ${error}`);
