@@ -1,5 +1,4 @@
 
-
 'use strict';
 
 const { Contract } = require('fabric-contract-api');
@@ -39,11 +38,11 @@ class ElectricLadger extends Contract {
         console.info(allResults);
         return JSON.stringify(allResults);
     }
-    async queryData(ctx,units){
+    async queryData(ctx,name){
         let queryString={};
-        queryString.selector={"units":units}
-        iterator=await ctx.stub.getQueryresult(JSON.stringify(queryString));
-        let result =tihs.iteratorData(iterator);
+        queryString.selector={"name":name}
+        let iterator=await ctx.stub.getQueryResult(JSON.stringify(queryString));
+        let result =await this.iteratorData(iterator);
         return JSON.stringify(result);
 
 

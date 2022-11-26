@@ -43,6 +43,7 @@ async function main() {
         // Submit the specified transaction.
         const users = [
            {
+            
             name:'Ali',
             address:'korangi',
             units:20
@@ -63,7 +64,7 @@ async function main() {
            {
             name:'tayyab',
             address:'clifton ',
-            units:700
+            units:7000
 
            },
            {
@@ -83,7 +84,6 @@ async function main() {
             console.info('Added <--> ', users[i]);
         }
         console.info('============= END : Initialize Ledger ===========');
-    
 
         // Disconnect from the gateway.
         await gateway.disconnect();
