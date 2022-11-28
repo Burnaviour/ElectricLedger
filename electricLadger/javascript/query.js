@@ -7,11 +7,11 @@ const path = require('path');
 const fs = require('fs');
 
 
-async function main(){
-   // load the network configuration
+// async function main(){
+//    // load the network configuration
   
-}
-main();
+// }
+// main();
 
 
 async function queryData(myquery) {
