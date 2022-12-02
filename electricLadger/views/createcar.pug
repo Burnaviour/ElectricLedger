@@ -1,0 +1,35 @@
+doctype html
+html
+ head
+  title FABCAR
+  body
+   h1 First Page
+   a(href='/api/queryallcars')  View All Cars
+   
+   a(href='/api/createcar')  Insert  a new car
+   br
+   br
+   br
+   form(method='POST' action='/api/addcar')
+    label() CARID   
+    input(type='text', placeholder='Car ID' name='carid')
+    br
+    br
+    label() MAKE 
+    input(type='text', placeholder='Make' name='make')
+    br
+    br
+    label() MODEL :  
+    input(type='text', placeholder='Model' name='model')
+    br
+    br
+    label() Colour :  
+    input(type='text', placeholder='Colour' name='colour')
+    br
+    br
+    label() Owner :  
+    input(type='text', placeholder='Owner' name='owner')
+    br
+    br
+    
+    input(type='Submit' value='Submit')

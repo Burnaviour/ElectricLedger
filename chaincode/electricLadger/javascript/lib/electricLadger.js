@@ -27,6 +27,7 @@ class ElectricLadger extends Contract {
         for await (const {key, value} of ctx.stub.getStateByRange(startKey, endKey)) {
             const strValue = Buffer.from(value).toString('utf8');
             let record;
+
             try {
                 record = JSON.parse(strValue);
             } catch (err) {
@@ -38,26 +39,48 @@ class ElectricLadger extends Contract {
         console.info(allResults);
         return JSON.stringify(allResults);
     }
-    async queryData(ctx,name){
+    async queryData(ctx,uid){
         let queryString={};
-        queryString.selector={"name":name}
+        queryString.selector={"_id":uid}
         let iterator=await ctx.stub.getQueryResult(JSON.stringify(queryString));
-        let result =await this.iteratorData(iterator);
+        let result =await this.iteratorData(iterator,false);
         return JSON.stringify(result);
 
 
     }
-    async iteratorData(iterator){
+
+    async GetAssetHistory(ctx, assetName) {
+
+		let resultsIterator = await ctx.stub.getHistoryForKey(assetName);
+		let results = await this.iteratorData(resultsIterator, true);
+
+		return JSON.stringify(results);
+	}
+    async iteratorData(iterator,isHistory){
         let resArray = [];
 
         while(true){
         let res=await iterator.next();
         let response={};
+          
         if(res.value && res.value.value.toString()){
+
+             if (isHistory && isHistory === true) {
+            response.TxId = res.value.txId;
+            response.Timestamp = res.value.timestamp;
+            try {
+                response.Value = JSON.parse(res.value.value.toString('utf8'));
+               
+            } catch (err) {
+                console.log(err);
+                response.Value = res.value.value.toString('utf8');
+            }}
+        else { 
             response.key=res.value.key;
             response.value = JSON.parse(res.value.value.toString('utf8'));
-            resArray.push(response);
-
+           
+        }
+        resArray.push(response);
         }
         if (res.done) {
             await iterator.close();
@@ -66,9 +89,6 @@ class ElectricLadger extends Contract {
         }
 
         }}
-
-
-    
 
 
 
