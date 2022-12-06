@@ -13,6 +13,7 @@ const helper = require('./helper')
 const log4js = require('log4js');
 const util = require('util');
 var logger = log4js.getLogger();
+
 var i =7;
 // async function main() {
 //     try {
@@ -142,14 +143,21 @@ const invokeTransaction = async (channelName, chaincodeName, fcn, args, username
         const network = await gateway.getNetwork(channelName);
 
         const contract = network.getContract(chaincodeName);
+        let content = JSON.parse(fs.readFileSync('./config/idgen.json', 'utf8'));
+        // edit or add property
+       
+        //write file
+        
 
         let result
         let message;
         if (fcn === "writeData") {
 
-            result = await contract.submitTransaction(fcn,'user'+i,Buffer.from(JSON.stringify(users)));
+            result = await contract.submitTransaction(fcn,'uid'+content.id,Buffer.from(JSON.stringify(users)));
             
             message = `Successfully added the user asset with key ${args[0]}`
+            content.id ++;
+            fs.writeFileSync('./config/idgen.json', JSON.stringify(content));
 
         } 
         // else if (fcn === "changeCarOwner") {

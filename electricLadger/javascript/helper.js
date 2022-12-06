@@ -140,19 +140,9 @@ const getRegisteredUser = async (username, userOrg, isJson) => {
             type: 'X.509',
         };
     }
-const isUserRegistered = async (username, userOrg) => {
-        const walletPath = await getWalletPath(userOrg)
-        const wallet = await Wallets.newFileSystemWallet(walletPath);
-        console.log(`Wallet path: ${walletPath}`);
     
-        const userIdentity = await wallet.get(username);
-        if (userIdentity) {
-            console.log(`An identity for the user ${username} exists in the wallet`);
-            return true
-        }
-        return false
-    }
-    
+    isUserRegistered(username,userOrg);
+
     await wallet.put(username, x509Identity);
     console.log(`Successfully registered and enrolled admin user ${username} and imported it into the wallet`);
 

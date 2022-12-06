@@ -20,4 +20,6 @@ node enrollAdmin.js
 echo -e "\n"
 node registerUser.js
 echo -e "\n"
+node prac.js
+echo -e "\n"
 

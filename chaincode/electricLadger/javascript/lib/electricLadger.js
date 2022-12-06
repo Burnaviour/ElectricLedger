@@ -6,7 +6,58 @@ const { Contract } = require('fabric-contract-api');
 class ElectricLadger extends Contract {
 
     async initLedger(ctx) {
-    await ctx.stub.putState("test","Hello World");
+
+    const users = [
+                       {
+                        
+                        name:'Ali',
+                        address:'korangi',
+                        units:20
+            
+                       },
+                       {
+                        name:'moiz',
+                        address:'malir cent',
+                        units:50
+            
+                       },
+                       {
+                        name:'akbar',
+                        address:'clifton ',
+                        units:70
+            
+                       },
+                       {
+                        name:'tayyab',
+                        address:'clifton ',
+                        units:7000
+            
+                       },
+                       {
+                        name:'muzafar',
+                        address:'clifton ',
+                        units:70
+            
+                       },
+                       {
+                        name:'nawaz ali',
+                        address:'clifton ',
+                        units:7000
+            
+                       }
+            
+            
+                    ];
+            
+                    for (let i = 0; i < users.length; i++) {
+                        users[i].docType = 'Users';
+                        await ctx.stub.putState('uid'+i, Buffer.from(JSON.stringify(users[i])));
+                       
+                        console.info('Added <--> ', users[i]);
+                    }
+                    console.info('============= END : Initialize Ledger ===========');
+            
+    
        return "success";
     }
     async writeData(ctx,key,value){
