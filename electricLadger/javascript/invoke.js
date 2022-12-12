@@ -248,6 +248,7 @@ const invokeUnitsPrices = async (
 
     let result;
     let message;
+    let open;
     if (fcn === "writeData") {
       result = await contract.submitTransaction(
         "writeData",
