@@ -20,6 +20,7 @@ node enrollAdmin.js
 echo -e "\n"
 node registerUser.js
 echo -e "\n"
+echo "############################################## INITIATING IDGEN  ##############################################"
 node prac.js
 echo -e "\n"
-
+echo "############################################## SUCCESSFULLY DONE IDGEN  ##############################################"

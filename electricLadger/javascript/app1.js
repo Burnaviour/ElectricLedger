@@ -19,9 +19,6 @@ const log4js = require('log4js');
 var logger = log4js.getLogger('electricLadger');
 const helper = require('./helper')
 const query = require('./query')
-// const invoke = require('./app/invoke')
-// const qscc = require('./app/qscc')
-// const query = require('./app/query')
 
 app.options('*', cors());
 app.use(cors());
@@ -153,13 +150,12 @@ app.post('/users/login', async function (req, res) {
 app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req, res) {
     try {
         logger.debug('==================== INVOKE ON CHAINCODE ==================');
-        var peers = req.body.peers;
+      
         var chaincodeName = req.params.chaincodeName;
         var channelName = req.params.channelName;
         var fcn = req.body.fcn;
         var args = req.body.args;
-        var transient = req.body.transient;
-        console.log(`Transient data is ;${transient}`)
+        
         logger.debug('channelName  : ' + channelName);
         logger.debug('chaincodeName : ' + chaincodeName);
         logger.debug('fcn  : ' + fcn);
@@ -181,7 +177,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function (req
             return;
         }
 
-        let message = await invoke.invokeTransaction(channelName, chaincodeName, fcn, args, req.username, req.orgname, transient);
+        let message = await invoke.invokeTransaction(channelName, chaincodeName, fcn, args, req.username, req.orgname);
         console.log(`message result is : ${message}`)
 
         const response_payload = {
@@ -257,6 +253,33 @@ app.get('/channels/:channelName/chaincodes/:chaincodeName', async function (req,
         }
         res.send(response_payload)
     }
+});
+
+app.post('/channels/:channelName/chaincodes/:chaincodeName/setPrices',async (req,res)=>{
+
+    var chaincodeName = req.params.chaincodeName;
+    var channelName = req.params.channelName;
+    var unitsPrice = req.body.unitsPrice;
+    var Service = req.body.Service;
+    var tax = req.body.tax;
+
+    logger.debug('channelName  : ' + channelName);
+    logger.debug('chaincodeName : ' + chaincodeName);
+    logger.debug('unitsPrice  : ' + unitsPrice);
+    logger.debug('Service  : ' + Service);
+    logger.debug('tax  : ' + tax);
+
+    let message = await invoke.invokeUnitsPrices(channelName, chaincodeName,'writeData',[unitsPrice,tax,Service], req.username, 'Org1');
+
+    const response_payload = {
+        result: message,
+        Response: true,
+        error: null,
+        errorData: null
+    }
+
+    res.send(response_payload);
+
 });
 
 // app.get('/qscc/channels/:channelName/chaincodes/:chaincodeName', async function (req, res) {
