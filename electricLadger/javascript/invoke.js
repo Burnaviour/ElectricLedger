@@ -14,7 +14,6 @@ const log4js = require("log4js");
 const util = require("util");
 var logger = log4js.getLogger();
 
-var i = 7;
 // async function main() {
 //     try {
 
@@ -190,6 +189,86 @@ const invokeTransaction = async (
   }
 };
 
+const invokeMeterUnits = async (
+  channelName,
+  chaincodeName,
+  fcn,
+  args,
+  username,
+  org_name,
+  uid
+) => {
+  try {
+    logger.debug(
+      util.format(
+        "\n============ invoke transaction on channel %s ============\n",
+        channelName
+      )
+    );
+
+    const users = {
+      name: args[0],
+      address: args[1],
+      units: args[2],
+    };
+    const ccp = await helper.getCCP(org_name);
+    // Create a new file system based wallet for managing identities.
+    const walletPath = await helper.getWalletPath(org_name); //path.join(process.cwd(), 'wallet');
+    const wallet = await Wallets.newFileSystemWallet(walletPath);
+    console.log(`Wallet path: ${walletPath}`);
+
+    // Check to see if we've already enrolled the user.
+    let identity = await wallet.get(username);
+    if (!identity) {
+      console.log(
+        `An identity for the user ${username} does not exist in the wallet, so registering user`
+      );
+      await helper.getRegisteredUser(username, org_name, true);
+      identity = await wallet.get(username);
+      console.log("Run the registerUser.js application before retrying");
+      return;
+    }
+
+    const connectOptions = {
+      wallet,
+      identity: username,
+      discovery: { enabled: true, asLocalhost: true },
+    };
+
+    // Create a new gateway for connecting to our peer node.
+    const gateway = new Gateway();
+    await gateway.conpriuserscesnect(ccp, connectOptions);
+
+    // Get the network (channel) our contract is deployed to.
+    const network = await gateway.getNetwork(channelName);
+
+    const contract = network.getContract(chaincodeName);
+
+    // edit or add propert
+
+    let result;
+    let message;
+    if (fcn === "writeData") {
+      result = await contract.submitTransaction(
+        "writeData",
+        uid,
+        Buffer.from(JSON.stringify(users))
+      );
+
+      message = `Successfully added the units of ${uid} `;
+    } else {
+      return `Invocation require either writeData as function but got ${fcn}`;
+    }
+
+    gateway.disconnect();
+
+    return message;
+  } catch (error) {
+    console.log(`Getting error: ${error}`);
+    return error.message;
+  }
+};
+
 const invokeUnitsPrices = async (
   channelName,
   chaincodeName,
@@ -279,4 +358,5 @@ const invokeUnitsPrices = async (
 module.exports = {
   invokeTransaction: invokeTransaction,
   invokeUnitsPrices: invokeUnitsPrices,
+  invokeMeterUnits: invokeMeterUnits,
 };
