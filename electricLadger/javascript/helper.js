@@ -1,5 +1,4 @@
 "use strict";
-
 var { Gateway, Wallets } = require("fabric-network");
 const path = require("path");
 const FabricCAServices = require("fabric-ca-client");
@@ -98,6 +97,13 @@ const getRegisteredUser = async (username, userOrg, isJson) => {
   const adminUser = await provider.getUserContext(adminIdentity, "admin");
   let secret;
   try {
+    // if (isUserRegistered(username, userOrg)) {
+    //   var response = {
+    //     success: true,
+    //     message: username + "is already exist in the wallet Successfully",
+    //   };
+    //   return response;
+    // }
     // Register the user, enroll the user, and import the new identity into the wallet.
     secret = await ca.register(
       {
@@ -139,8 +145,6 @@ const getRegisteredUser = async (username, userOrg, isJson) => {
     };
   }
 
-  isUserRegistered(username, userOrg);
-
   await wallet.put(username, x509Identity);
   console.log(
     `Successfully registered and enrolled admin user ${username} and imported it into the wallet`
@@ -152,8 +156,6 @@ const getRegisteredUser = async (username, userOrg, isJson) => {
   };
   return response;
 };
-
-exports.getRegisteredUser = getRegisteredUser;
 
 module.exports = {
   getCCP: getCCP,
