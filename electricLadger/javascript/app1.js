@@ -121,7 +121,9 @@ app.post("/register", async function (req, res) {
     let response = {
       success: true,
       username: username,
-      message: username + "is already exist in the wallet Successfully",
+      IsNewUser: false,
+      message: username + " is already exist in the wallet Successfully",
+      token: token,
     };
     res.json(response);
     return;
@@ -140,6 +142,7 @@ app.post("/register", async function (req, res) {
       username,
       orgName
     );
+    response.IsNewUser = true;
     response.token = token;
     res.json(response);
   } else {
