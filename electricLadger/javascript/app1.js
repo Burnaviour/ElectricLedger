@@ -144,6 +144,7 @@ app.post("/register", async function (req, res) {
     );
     response.IsNewUser = true;
     response.token = token;
+
     res.json(response);
   } else {
     logger.debug(
@@ -269,7 +270,7 @@ app.get(
       console.log(`chaincode name is :${chaincodeName}`);
       let args = req.query.args;
       let fcn = req.query.fcn;
-      let peer = req.query.peer;
+      let history = req.query.history;
 
       logger.debug("channelName : " + channelName);
       logger.debug("chaincodeName : " + chaincodeName);
@@ -297,6 +298,7 @@ app.get(
       args = JSON.parse(args);
 
       logger.debug(args[0]);
+      logger.debug(typeof history);
 
       let message = await query.query(
         channelName,
@@ -306,21 +308,30 @@ app.get(
         req.username,
         "Org1"
       );
-      let message2 = await query.queryHistoruData(
-        channelName,
-        chaincodeName,
-        args[0],
-        req.username,
-        "Org1"
-      );
-      const response_payload = {
-        result: message,
-        history: message2,
-        error: null,
-        errorData: null,
-      };
+      if (history === "true") {
+        let message2 = await query.queryHistoruData(
+          channelName,
+          chaincodeName,
+          args[0],
+          req.username,
+          "Org1"
+        );
+        const response_payload = {
+          result: message,
+          history: message2,
+          error: null,
+          errorData: null,
+        };
+        res.send(response_payload);
+      } else {
+        const response_payload = {
+          result: message,
+          error: null,
+          errorData: null,
+        };
 
-      res.send(response_payload);
+        res.send(response_payload);
+      }
     } catch (error) {
       const response_payload = {
         result: null,
