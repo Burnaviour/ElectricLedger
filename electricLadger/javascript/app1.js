@@ -298,8 +298,14 @@ app.get(
       args = JSON.parse(args);
 
       logger.debug(args[0]);
-      logger.debug(typeof history);
-
+      if (!args) {
+        const response_payload = {
+          result: message,
+          error: null,
+          errorData: null,
+        };
+        res.send(response_payload);
+      }
       let message = await query.query(
         channelName,
         chaincodeName,
@@ -323,15 +329,15 @@ app.get(
           errorData: null,
         };
         res.send(response_payload);
-      } else {
-        const response_payload = {
-          result: message,
-          error: null,
-          errorData: null,
-        };
-
-        res.send(response_payload);
       }
+
+      const response_payload = {
+        result: message,
+        error: null,
+        errorData: null,
+      };
+
+      res.send(response_payload);
     } catch (error) {
       const response_payload = {
         result: null,
