@@ -276,7 +276,8 @@ app.get(
       logger.debug("chaincodeName : " + chaincodeName);
       logger.debug("fcn : " + fcn);
       logger.debug("args : " + args);
-
+      logger.debug("history : " + history);
+      console.log(typeof history);
       if (!chaincodeName) {
         res.json(getErrorMessage("'chaincodeName'"));
         return;
@@ -327,14 +328,18 @@ app.get(
           history: message2,
           error: null,
           errorData: null,
+          Ishistory: true,
         };
+        console.log(response_payload);
         res.send(response_payload);
+        return;
       }
 
       const response_payload = {
         result: message,
         error: null,
         errorData: null,
+        Ishistory: false,
       };
 
       res.send(response_payload);
