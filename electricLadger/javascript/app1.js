@@ -103,7 +103,7 @@ app.post("/register", async function (req, res) {
     res.json(getErrorMessage("'username'"));
     return;
   }
-  if (!orgName) {
+  if (!orgName || orgName === "none") {
     res.json(getErrorMessage("'orgName'"));
     return;
   }
@@ -168,7 +168,7 @@ app.post("/users/login", async function (req, res) {
     res.json(getErrorMessage("'username'"));
     return;
   }
-  if (!orgName) {
+  if (!orgName || orgName === "none") {
     res.json(getErrorMessage("'orgName'"));
     return;
   }
