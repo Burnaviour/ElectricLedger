@@ -293,6 +293,7 @@ const invokeUnitsPrices = async (
   org_name
 ) => {
   try {
+    ``;
     logger.debug(
       util.format(
         "\n============ invoke transaction on channel %s ============\n",

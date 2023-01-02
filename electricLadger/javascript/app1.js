@@ -354,9 +354,14 @@ app.get(
   }
 );
 
+//######################################
 app.post(
   "/channels/:channelName/chaincodes/:chaincodeName/setPrices",
+
   async (req, res) => {
+    logger.debug(
+      "==================== Invoke prices BY CHAINCODE =================="
+    );
     var chaincodeName = req.params.chaincodeName;
     var channelName = req.params.channelName;
     var unitsPrice = req.body.unitsPrice;
