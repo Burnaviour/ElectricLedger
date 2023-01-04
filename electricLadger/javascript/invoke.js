@@ -350,7 +350,7 @@ const invokeUnitsPrices = async (
         Buffer.from(JSON.stringify(prices))
       );
 
-      message = `Successfully added the Prices of thhis month`;
+      message = `Successfully added the Prices for this month`;
     } else {
       return `Invocation require either writeData as function but got ${fcn}`;
     }

@@ -19,6 +19,7 @@ const log4js = require("log4js");
 var logger = log4js.getLogger("electricLadger");
 const helper = require("./helper");
 const query = require("./query");
+const getData = require("./getData");
 
 app.options("*", cors());
 app.use(cors());
@@ -374,7 +375,16 @@ app.post(
     logger.debug("unitsPrice  : " + unitsPrice);
     logger.debug("Service  : " + Service);
     logger.debug("tax  : " + tax);
+    if (!unitsPrice || !Service || !tax) {
+      const response_payload = {
+        message: "please fill all the fields given",
+        success: false,
+        error: null,
+        errorData: null,
+      };
 
+      res.send(response_payload);
+    }
     let message = await invoke.invokeUnitsPrices(
       channelName,
       chaincodeName,
@@ -383,18 +393,136 @@ app.post(
       req.username,
       "Org1"
     );
+    if (message) {
+      const response_payload = {
+        result: message,
+        success: true,
+        error: null,
+        errorData: null,
+      };
 
-    const response_payload = {
-      result: message,
-      Response: true,
-      error: null,
-      errorData: null,
-    };
-
-    res.send(response_payload);
+      res.send(response_payload);
+    } else {
+      const response_payload = {
+        result: message,
+        success: false,
+        error: null,
+        message: "there was an error while doing transaction ",
+        errorData: null,
+      };
+      res.send(response_payload);
+    }
   }
 );
 
+app.get(
+  "/channels/:channelName/chaincodes/:chaincodeName/getbill",
+  async function (req, res) {
+    try {
+      logger.debug(
+        "==================== QUERY BY CHAINCODE =================="
+      );
+
+      var channelName = req.params.channelName;
+      var chaincodeName = req.params.chaincodeName;
+      console.log(`chaincode name is :${chaincodeName}`);
+      let args = req.query.args;
+      let fcn = req.query.fcn;
+      let history = req.query.history;
+      logger.debug("channelName : " + channelName);
+      logger.debug("chaincodeName : " + chaincodeName);
+      logger.debug("fcn : " + fcn);
+      logger.debug("args : " + args);
+
+      if (!chaincodeName) {
+        res.json(getErrorMessage("'chaincodeName'"));
+        return;
+      }
+      if (!channelName) {
+        res.json(getErrorMessage("'channelName'"));
+        return;
+      }
+      if (!fcn) {
+        res.json(getErrorMessage("'fcn'"));
+        return;
+      }
+      if (!args) {
+        res.json(getErrorMessage("'args'"));
+        return;
+      }
+      console.log("args==========", args);
+      args = args.replace(/'/g, '"');
+      args = JSON.parse(args);
+
+      logger.debug(args[0]);
+      if (!args) {
+        const response_payload = {
+          result: message,
+          error: null,
+          errorData: null,
+        };
+        res.send(response_payload);
+      }
+
+      if (history === "true") {
+        let message1 = await query.query(
+          channelName,
+          chaincodeName,
+          "unitPrices",
+          fcn,
+          req.username,
+          "Org1"
+        );
+        let message = await query.queryHistoruData(
+          channelName,
+          chaincodeName,
+          args[0],
+          req.username,
+          "Org1"
+        );
+        // console.log(message);
+        // console.log(message1);
+        let result = message && message1 && getData.getData(message, message1);
+        const response_payload = {
+          result: message,
+
+          error: null,
+          errorData: null,
+          Ishistory: true,
+        };
+
+        res.send(response_payload);
+        return;
+      }
+    } catch (error) {
+      const response_payload = {
+        result: null,
+        error: error.name,
+        errorData: error.message,
+      };
+      res.send(response_payload);
+    }
+  }
+);
+
+//////////////////////////////////LATER USE FOR WALLLET ID GET REQUEST//////////////////////////////////
+
+// const fs = require('fs');
+
+// // Read the wallet ID file
+// fs.readFile('/path/to/walletIDFile', (err, data) => {
+//   if (err) {
+//     // Handle the error
+//   }
+
+//   // Return the wallet ID file to the client
+//   res.json({
+//     success: true,
+//     walletIDFile: data
+//   });
+// });
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////
 // app.get('/qscc/channels/:channelName/chaincodes/:chaincodeName', async function (req, res) {
 //     try {
 //         logger.debug('==================== QUERY BY CHAINCODE ==================');
