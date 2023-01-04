@@ -5,6 +5,9 @@ const getData = function (message, message1) {
   if (message) {
     let arr = message.map((item) => item.Value.units);
     console.log("arr", arr, "arr len ", arr.length);
+    if (arr.length == 0) {
+      return false;
+    }
     console.log("index after mod", arr.length % 30);
 
     let index = arr.length % 30;

@@ -496,7 +496,18 @@ app.get(
             Ishistory: true,
           };
           res.send(response_payload);
+        } else {
+          const response_payload = {
+            success: false,
+            result: "user not Found Please Enter valid user id ",
+            error: null,
+            errorData: null,
+            Ishistory: true,
+          };
+          console.log(response_payload);
+          res.send(response_payload);
         }
+
         return;
       }
     } catch (error) {
