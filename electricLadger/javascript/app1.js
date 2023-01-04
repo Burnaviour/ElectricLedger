@@ -144,6 +144,7 @@ app.post("/register", async function (req, res) {
     );
     response.IsNewUser = true;
     response.token = token;
+    response.username = username;
 
     res.json(response);
   } else {
