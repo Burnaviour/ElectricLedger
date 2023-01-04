@@ -483,15 +483,20 @@ app.get(
         // console.log(message);
         // console.log(message1);
         let result = message && message1 && getData.getData(message, message1);
-        const response_payload = {
-          result: message,
-
-          error: null,
-          errorData: null,
-          Ishistory: true,
-        };
-
-        res.send(response_payload);
+        if (result) {
+          console.log(result);
+          const response_payload = {
+            success: true,
+            result: result,
+            unitPrice: message1[0].value.unitPrice,
+            ServiceCharges: message1[0].value.servicesCharges,
+            tax: message1[0].value.tax,
+            error: null,
+            errorData: null,
+            Ishistory: true,
+          };
+          res.send(response_payload);
+        }
         return;
       }
     } catch (error) {

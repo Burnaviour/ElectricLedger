@@ -1,4 +1,4 @@
-const getData = async function (message, message1) {
+const getData = function (message, message1) {
   let currentUsage = 0;
   let monthlyBill = 0;
   console.log("message", message1);
@@ -23,8 +23,8 @@ const getData = async function (message, message1) {
 
   console.log("current Usage", currentUsage);
   console.log("current bill", monthlyBill);
-
-  return message;
+  let data = { currentUsage: currentUsage, monthlyBill: monthlyBill };
+  return data;
 };
 
 module.exports = {
