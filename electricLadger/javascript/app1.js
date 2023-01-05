@@ -465,6 +465,15 @@ app.get(
       }
 
       if (history === "true") {
+        let message2 = await query.query(
+          channelName,
+          chaincodeName,
+          args[0],
+          fcn,
+          req.username,
+          "Org1"
+        );
+        console.log(message2);
         let message1 = await query.query(
           channelName,
           chaincodeName,
@@ -487,6 +496,9 @@ app.get(
           console.log(result);
           const response_payload = {
             success: true,
+            uid: message2[0].key,
+            name: message2[0].value.name,
+            address: message2[0].value.address,
             result: result,
             unitPrice: message1[0].value.unitPrice,
             ServiceCharges: message1[0].value.servicesCharges,
@@ -495,6 +507,7 @@ app.get(
             errorData: null,
             Ishistory: true,
           };
+
           res.send(response_payload);
         } else {
           const response_payload = {
