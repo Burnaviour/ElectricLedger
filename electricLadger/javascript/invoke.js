@@ -117,7 +117,7 @@ const invokeTransaction = async (
     const users = {
       name: args[0],
       address: args[1],
-      units: args[2],
+      units: 0,
     };
     const ccp = await helper.getCCP(org_name);
 
@@ -166,7 +166,9 @@ const invokeTransaction = async (
         Buffer.from(JSON.stringify(users))
       );
 
-      message = `Successfully added the user asset with key ${args[0]}`;
+      message = `Successfully added the user name ${
+        args[0]
+      } assets with user id ${"uid" + content.id}`;
       content.id++;
       fs.writeFileSync("./config/idgen.json", JSON.stringify(content));
     } else {

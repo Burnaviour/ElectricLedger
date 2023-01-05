@@ -20,7 +20,7 @@ var logger = log4js.getLogger("electricLadger");
 const helper = require("./helper");
 const query = require("./query");
 const getData = require("./getData");
-
+const fs = require("fs");
 app.options("*", cors());
 app.use(cors());
 app.use(bodyParser.json());
@@ -199,7 +199,7 @@ app.post("/users/login", async function (req, res) {
 
 // Invoke transaction on chaincode on target peers
 app.post(
-  "/channels/:channelName/chaincodes/:chaincodeName",
+  "/channels/:channelName/chaincodes/:chaincodeName/invoke",
   async function (req, res) {
     try {
       logger.debug(
@@ -209,26 +209,42 @@ app.post(
       var chaincodeName = req.params.chaincodeName;
       var channelName = req.params.channelName;
       var fcn = req.body.fcn;
-      var args = req.body.args;
+      var name = req.body.name.trim();
+      var address = req.body.address.trim();
+      var units = req.body.units;
 
       logger.debug("channelName  : " + channelName);
       logger.debug("chaincodeName : " + chaincodeName);
       logger.debug("fcn  : " + fcn);
-      logger.debug("args  : " + args);
+      logger.debug("name  : " + name);
+      logger.debug("address  : " + address);
+      logger.debug("units  : " + units);
       if (!chaincodeName) {
+        console.log("coun1");
         res.json(getErrorMessage("'chaincodeName'"));
         return;
       }
       if (!channelName) {
+        console.log("coun2");
         res.json(getErrorMessage("'channelName'"));
         return;
       }
       if (!fcn) {
+        console.log("coun3");
         res.json(getErrorMessage("'fcn'"));
         return;
       }
-      if (!args) {
-        res.json(getErrorMessage("'args'"));
+      if (name.length === 0) {
+        res.json({
+          success: false,
+          message: "name" + " field is missing or Invalid in the request",
+        });
+        if (address.length === 0) {
+          res.json({
+            success: false,
+            message: "address" + "field is missing or Invalid in the request",
+          });
+        }
         return;
       }
 
@@ -236,21 +252,23 @@ app.post(
         channelName,
         chaincodeName,
         fcn,
-        args,
+        [name, address],
         req.username,
         req.orgname
       );
-      console.log(`message result is : ${message}`);
 
       const response_payload = {
         result: message,
+        success: true,
         error: null,
         errorData: null,
       };
       res.send(response_payload);
+      return;
     } catch (error) {
       const response_payload = {
         result: null,
+        success: false,
         error: error.name,
         errorData: error.message,
       };
@@ -535,11 +553,29 @@ app.get(
 );
 
 //////////////////////////////////LATER USE FOR WALLLET ID GET REQUEST//////////////////////////////////
+app.get("/api/login", (req, res) => {
+  const filePath = `/home/lightyagami/fabric-samples/electricLadger/javascript/wallet/${req.query.name}.id`;
+  fs.access(filePath, fs.constants.F_OK, (error) => {
+    if (error) {
+      // The file was not found
+      res.status(404).send({ error: "User not found" });
+    } else {
+      // The file was found
+      fs.readFile(filePath, (error, data) => {
+        if (error) {
+          res.status(500).send({ error: "Error reading file" });
+        } else {
+          res.send(data);
+        }
+      });
+    }
+  });
+});
 
-// const fs = require('fs');
+// const fs = require("fs");
 
 // // Read the wallet ID file
-// fs.readFile('/path/to/walletIDFile', (err, data) => {
+// fs.readFile("/path/to/walletIDFile", (err, data) => {
 //   if (err) {
 //     // Handle the error
 //   }
@@ -547,7 +583,7 @@ app.get(
 //   // Return the wallet ID file to the client
 //   res.json({
 //     success: true,
-//     walletIDFile: data
+//     walletIDFile: data,
 //   });
 // });
 
