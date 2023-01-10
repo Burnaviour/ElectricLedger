@@ -97,14 +97,14 @@ const getRegisteredUser = async (username, userOrg, isJson) => {
   const adminUser = await provider.getUserContext(adminIdentity, "admin");
   let secret;
   try {
-    // if (isUserRegistered(username, userOrg)) {
-    //   var response = {
-    //     success: true,
-    //     message: username + "is already exist in the wallet Successfully",
-    //   };
-    //   return response;
-    // }
-    // Register the user, enroll the user, and import the new identity into the wallet.
+    /*     if (isUserRegistered(username, userOrg)) {
+      var response = {
+        success: true,
+        message: username + "is already exist in the wallet Successfully",
+      };
+      return response;
+    } */
+    //Register the user, enroll the user, and import the new identity into the wallet.
     secret = await ca.register(
       {
         affiliation: await getAffiliation(userOrg),

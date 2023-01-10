@@ -212,6 +212,7 @@ app.post(
       var name = req.body.name.trim();
       var address = req.body.address.trim();
       var units = req.body.units;
+      var cnic = req.body.cnic.trim();
 
       logger.debug("channelName  : " + channelName);
       logger.debug("chaincodeName : " + chaincodeName);
@@ -219,19 +220,21 @@ app.post(
       logger.debug("name  : " + name);
       logger.debug("address  : " + address);
       logger.debug("units  : " + units);
+      logger.debug("cnic  : " + cnic);
       if (!chaincodeName) {
-        console.log("coun1");
         res.json(getErrorMessage("'chaincodeName'"));
         return;
       }
       if (!channelName) {
-        console.log("coun2");
         res.json(getErrorMessage("'channelName'"));
         return;
       }
       if (!fcn) {
-        console.log("coun3");
         res.json(getErrorMessage("'fcn'"));
+        return;
+      }
+      if (cnic.length === 0) {
+        res.json(getErrorMessage("'cnic'"));
         return;
       }
       if (name.length === 0) {
@@ -252,7 +255,7 @@ app.post(
         channelName,
         chaincodeName,
         fcn,
-        [name, address],
+        [name, address, cnic],
         req.username,
         req.orgname
       );
@@ -343,6 +346,7 @@ app.get(
           req.username,
           "Org1"
         );
+
         const response_payload = {
           result: message,
           history: message2,
@@ -491,7 +495,13 @@ app.get(
           req.username,
           "Org1"
         );
-        console.log(message2);
+        let message = await query.queryHistoruData(
+          channelName,
+          chaincodeName,
+          args[0],
+          req.username,
+          "Org1"
+        );
         let message1 = await query.query(
           channelName,
           chaincodeName,
@@ -500,15 +510,9 @@ app.get(
           req.username,
           "Org1"
         );
-        let message = await query.queryHistoruData(
-          channelName,
-          chaincodeName,
-          args[0],
-          req.username,
-          "Org1"
-        );
-        // console.log(message);
-        // console.log(message1);
+        console.log("history ", message);
+        console.log("World State", message2);
+        console.log("units", message1);
         let result = message && message1 && getData.getData(message, message1);
         if (result) {
           console.log(result);

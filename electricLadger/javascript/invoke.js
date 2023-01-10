@@ -118,6 +118,7 @@ const invokeTransaction = async (
       name: args[0],
       address: args[1],
       units: 0,
+      cnic: args[3],
     };
     const ccp = await helper.getCCP(org_name);
 
@@ -218,6 +219,8 @@ const invokeMeterUnits = async (
       name: args[0],
       address: args[1],
       units: args[2],
+      cnic: args[3],
+      uid: args[4],
     };
     // load the network configuration
     const ccpPath = path.resolve(
@@ -307,6 +310,7 @@ const invokeUnitsPrices = async (
       unitPrice: args[0],
       tax: args[1],
       servicesCharges: args[2],
+      uid: "unitPrices",
     };
     const ccp = await helper.getCCP(org_name);
     // Create a new file system based wallet for managing identities.

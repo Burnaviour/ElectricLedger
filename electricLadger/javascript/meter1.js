@@ -2,7 +2,7 @@ const invoke = require("./invoke");
 // Initialize the units to 0
 
 // Set the update interval to 2 minutes (120000 milliseconds)
-const updateInterval = 3000;
+const updateInterval = 6000;
 
 // Run the update loop
 setInterval(async function () {
@@ -13,12 +13,13 @@ setInterval(async function () {
     "mycahnnel",
     "electricLadger",
     "writeData",
-    ["Ali", "korangi", units],
+    ["Ali", "korangi", units, "3521-34545", "uid0"],
     "muzafar",
     "Org1",
     "uid0"
   );
 
   // Log the updated units
+
   console.log(`Updated units: ${message}`);
 }, updateInterval);
