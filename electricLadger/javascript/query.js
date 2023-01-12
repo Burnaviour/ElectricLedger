@@ -120,7 +120,7 @@ async function queryHistory(
     const network = await gateway.getNetwork(channelName);
 
     const contract = network.getContract(chaincodeName);
-
+    console.log("srgs", args);
     let result = await contract.evaluateTransaction("GetAssetHistory", args);
 
     result = JSON.parse(result.toString());

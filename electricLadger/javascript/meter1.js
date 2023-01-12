@@ -13,11 +13,12 @@ setInterval(async function () {
     "mycahnnel",
     "electricLadger",
     "writeData",
-    ["Ali", "korangi", units],
+    ["Ali", "korangi", units, "35201-35202"],
     "muzafar",
     "Org1",
     "uid0"
   );
+
 
   // Log the updated units
   console.log(`Updated units: ${message}`);

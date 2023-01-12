@@ -118,6 +118,7 @@ const invokeTransaction = async (
       name: args[0],
       address: args[1],
       units: 0,
+      cnic: args[2],
     };
     const ccp = await helper.getCCP(org_name);
 
@@ -166,9 +167,8 @@ const invokeTransaction = async (
         Buffer.from(JSON.stringify(users))
       );
 
-      message = `Successfully added the user name ${
-        args[0]
-      } assets with user id ${"uid" + content.id}`;
+      message = `Successfully added the user name ${args[0]
+        } assets with user id ${"uid" + content.id}`;
       content.id++;
       fs.writeFileSync("./config/idgen.json", JSON.stringify(content));
     } else {
@@ -218,6 +218,7 @@ const invokeMeterUnits = async (
       name: args[0],
       address: args[1],
       units: args[2],
+      cnic: args[3],
     };
     // load the network configuration
     const ccpPath = path.resolve(
