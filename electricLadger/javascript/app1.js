@@ -131,6 +131,11 @@ app.post("/register", async function (req, res) {
     },
     app.get("secret")
   );
+
+  username = username.trim();
+  cnic = cnic.trim();
+  uid = uid.trim();
+
   if (type === "user") {
     let message = await query.query(
       "mychannel",
@@ -141,7 +146,7 @@ app.post("/register", async function (req, res) {
       "Org1"
     );
     if (message[0]) {
-      console.log((message[0]))
+      console.log((message[0]));
       if (message[0].key === uid && message[0].value.cnic === cnic) {
         let isUserRegistered = await helper.isUserRegistered(username, orgName);
         if (isUserRegistered) {
@@ -175,6 +180,7 @@ app.post("/register", async function (req, res) {
           response.username = username;
 
           res.json(response);
+          return;
         } else {
           logger.debug(
             "Failed to register the username %s for organization %s with::%s",
@@ -183,13 +189,14 @@ app.post("/register", async function (req, res) {
             response
           );
           res.json({ success: false, message: response });
+          return
+
         }
-        res.json({ success: true, message: message });
-        return
+
       }
       let response = {
         success: false,
-        message: "given cnic and uid didnt match please provide correct info",
+        message: "Given Cnic and Uid didn't not Found please provide correct info",
       };
       res.json(response)
 
@@ -197,63 +204,22 @@ app.post("/register", async function (req, res) {
     }
     let response = {
       success: false,
-      message: uid + " not found please request for new connection first !  ",
+      message: uid + " not found please request for new Connection first !",
     };
     res.json(response)
     return;
 
-
-
-
   }
-  let isUserRegistered = await helper.isUserRegistered(username, orgName);
-  if (isUserRegistered) {
-    let response = {
-      success: true,
-      username: username,
-      IsNewUser: false,
-      message: username + " is already exist in the wallet Successfully",
-      token: token,
-    };
-    res.json(response);
-    return;
-  }
-  //Register the user, enroll the user, and import the new identity into the wallet.
 
-  let response = await helper.getRegisteredUser(username, orgName, true);
 
-  logger.debug(
-    "-- returned from registering the username %s for organization %s",
-    username,
-    orgName
-  );
-  if (response && typeof response !== "string") {
-    logger.debug(
-      "Successfully registered the username %s for organization %s",
-      username,
-      orgName
-    );
-    response.IsNewUser = true;
-    response.token = token;
-    response.username = username;
 
-    res.json(response);
-  } else {
-    logger.debug(
-      "Failed to register the username %s for organization %s with::%s",
-      username,
-      orgName,
-      response
-    );
-    res.json({ success: false, message: response });
-  }
 });
 // Register and enroll user
 app.post("/admin/register", async function (req, res) {
   var username = req.body.username;
   var orgName = req.body.orgName;
 
-  logger.debug("End point : /register");
+  logger.debug("End point : admin/register");
   logger.debug("User name : " + username);
   logger.debug("Org name  : " + orgName);
 
@@ -323,7 +289,112 @@ app.post("/admin/register", async function (req, res) {
 app.post("/users/login", async function (req, res) {
   var username = req.body.username;
   var orgName = req.body.orgName;
-  logger.debug("End point : /users");
+  var type = req.body.type;
+  var cnic = req.body.cnic
+  var uid = req.body.uid
+  logger.debug("End point : /users/login");
+  logger.debug("User name : " + username);
+  logger.debug("Org name  : " + orgName);
+  if (!username) {
+    res.json(getErrorMessage("'username'"));
+    return;
+  }
+  if (!orgName || orgName === "none") {
+    res.json(getErrorMessage("'orgName'"));
+    return;
+  }
+  if (!cnic) {
+    res.json(getErrorMessage("'cnic'"));
+    return;
+  }
+  if (!uid) {
+    res.json(getErrorMessage("'uid'"));
+    return;
+  }
+
+  username = username.trim();
+  cnic = cnic.trim();
+  uid = uid.trim();
+  if (type === "user") {
+    let message = await query.query(
+      "mychannel",
+      "electricLadger",
+      uid,
+      "queryData",
+      "appUser",
+      "Org1"
+    );
+    let prices = await query.query(
+      "mychannel",
+      "electricLadger",
+      "unitPrices",
+      "queryData",
+      "appUser",
+      "Org1"
+    );
+    console.log(prices);
+
+    if (message[0]) {
+
+      if (message[0].key === uid && message[0].value.cnic === cnic) {
+
+        var token = jwt.sign(
+          {
+            exp: Math.floor(Date.now() / 1000) + parseInt(constants.jwt_expiretime),
+            username: username,
+            orgName: orgName,
+          },
+          app.get("secret")
+        );
+        let isUserRegistered = await helper.isUserRegistered(username, orgName);
+
+        //Register the user, enroll the user, and import the new identity into the wallet.
+        if (isUserRegistered) {
+          res.json({ success: true, token: token, username: username, orgName: orgName, prices: prices[0].value });
+          return;
+        } else {
+          logger.debug(`user ${username} does not exist `);
+          res.json({
+            success: false,
+            message: `User with username ${username} is not registered with ${orgName}, Please register first.`,
+          }
+          );
+          return;
+        }
+
+
+
+
+      }
+      let response = {
+        success: false,
+        message: "Given Cnic and uid didn't not Found please provide correct info",
+      };
+      res.json(response)
+
+      return
+    }
+    let response = {
+      success: false,
+      message: uid + " not found.Please check your given Uid!",
+    };
+    res.json(response)
+    return;
+
+  }
+
+
+
+
+});
+
+//admin login
+
+// Login and get jwt
+app.post("/admin/login", async function (req, res) {
+  var username = req.body.username;
+  var orgName = req.body.orgName;
+  logger.debug("End point : /admin/login");
   logger.debug("User name : " + username);
   logger.debug("Org name  : " + orgName);
   if (!username) {
@@ -683,7 +754,7 @@ app.get(
             result: result,
             unitPrice: message1[0].value.unitPrice,
             ServiceCharges: message1[0].value.servicesCharges,
-            tax: message1[0].value.tax,
+            tax: result.tax,
             error: null,
             errorData: null,
             Ishistory: true,

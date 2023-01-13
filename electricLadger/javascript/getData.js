@@ -16,14 +16,15 @@ const getData = function (message, message1) {
       currentUsage += arr[i];
     }
     if (message1) {
+      var tax = Math.round((currentUsage * message1[0].value.unitPrice) * message1[0].value.tax);
       monthlyBill =
-        currentUsage * message1[0].value.unitPrice +
-        message1[0].value.servicesCharges +
-        message1[0].value.tax;
+        (currentUsage * message1[0].value.unitPrice) + tax +
+        message1[0].value.servicesCharges;
     }
   }
 
-  let data = { monthlyUnits: currentUsage, monthlyBill: monthlyBill };
+  let data = { monthlyUnits: currentUsage, monthlyBill: monthlyBill, tax: tax };
+  console.log(data);
   return data;
 };
 
