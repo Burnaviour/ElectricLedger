@@ -5,6 +5,7 @@ const http = require("http");
 const util = require("util");
 const express = require("express");
 const app = express();
+const path = require("path");
 const expressJWT = require("express-jwt");
 const jwt = require("jsonwebtoken");
 const invoke = require("./invoke");
@@ -21,6 +22,7 @@ const helper = require("./helper");
 const query = require("./query");
 const getData = require("./getData");
 const fs = require("fs");
+const { json } = require("body-parser");
 app.options("*", cors());
 app.use(cors());
 app.use(bodyParser.json());
@@ -35,7 +37,7 @@ app.use(
   expressJWT({
     secret: "thisismysecret",
   }).unless({
-    path: ["/users", "/users/login", "/register", "/admin/register"],
+    path: ["/users", "/users/login", "/admin/login", "/register", "/admin/register"],
   })
 );
 app.use(bearerToken());
@@ -45,7 +47,7 @@ logger.level = "debug";
 app.use((req, res, next) => {
   logger.debug("New req for %s", req.originalUrl);
   if (
-    req.originalUrl.indexOf("/users") >= 0 ||
+    req.originalUrl.indexOf("/admin/login") >= 0 ||
     req.originalUrl.indexOf("/users/login") >= 0 ||
     req.originalUrl.indexOf("/register") >= 0
   ) {
@@ -232,7 +234,6 @@ app.post("/admin/register", async function (req, res) {
     return;
   }
 
-
   var token = jwt.sign(
     {
       exp: Math.floor(Date.now() / 1000) + parseInt(constants.jwt_expiretime),
@@ -244,12 +245,19 @@ app.post("/admin/register", async function (req, res) {
 
   let isUserRegistered = await helper.isUserRegistered(username, orgName);
   if (isUserRegistered) {
+
+    var walletFilePath = path.join(__dirname, 'wallet', username + '.id');
+    var walletFile = fs.readFileSync(walletFilePath);
+    res.setHeader("Content-disposition", "attachment; filename=" + username + ".id");
+    res.set("Content-Type", "application/json");
     let response = {
       success: true,
       username: username,
       IsNewUser: false,
       message: username + " is already exist in the wallet Successfully",
       token: token,
+      walletFile: walletFile,
+      walletmsg: "Your wallet file has been saved. You can now log in using your credentials.",
     };
     res.json(response);
     return;
@@ -272,8 +280,15 @@ app.post("/admin/register", async function (req, res) {
     response.IsNewUser = true;
     response.token = token;
     response.username = username;
-
-    res.json(response);
+    // Get the user's wallet file
+    var walletFilePath = path.join(__dirname, 'wallet', username + '.id');
+    var walletFile = fs.readFileSync(walletFilePath);
+    // Send the wallet file, message, and success flag to the user
+    res.setHeader("Content-disposition", "attachment; filename=" + username + ".id");
+    res.set("Content-Type", "application/json");
+    response.walletFile = walletFile;
+    response.walletmsg = "Your wallet file has been saved. You can now log in using your credentials.",
+      res.json(response);
   } else {
     logger.debug(
       "Failed to register the username %s for organization %s with::%s",
@@ -283,6 +298,43 @@ app.post("/admin/register", async function (req, res) {
     );
     res.json({ success: false, message: response });
   }
+});
+
+
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now());
+  }
+});
+
+const upload = multer({ dest: 'uploads/' });
+app.post("/api/verifyWallet", upload.single('file'), async function (req, res) {
+  //Get the path of the file on the server
+  var username = req.body.username
+  var uploadedFile = req.file
+  var uploadedFileContent = fs.readFileSync(uploadedFile.path);
+  var walletFilePath = path.join(__dirname, 'wallet', username + '.id');
+  var walletFile = fs.readFileSync(walletFilePath);
+  // Read the contents of the file on the server
+
+  if (uploadedFileContent.toString() === walletFile.toString()) {
+    console.log(username)
+    const response_payload = { success: true, message: "Succesfully Verified " };
+    res.status(200).send(response_payload);
+    return;
+  } else {
+    const response_payload = { success: false, message: 'File does not match' };
+    res.status(400).send(response_payload);
+
+    return;
+  }
+
+
+
 });
 
 // Login and get jwt
@@ -389,7 +441,6 @@ app.post("/users/login", async function (req, res) {
 });
 
 //admin login
-
 // Login and get jwt
 app.post("/admin/login", async function (req, res) {
   var username = req.body.username;
@@ -608,7 +659,8 @@ app.get(
   }
 );
 
-//######################################
+
+// "==================== Invoke prices BY CHAINCODE =================="######################################
 app.post(
   "/channels/:channelName/chaincodes/:chaincodeName/setPrices",
 
@@ -667,6 +719,7 @@ app.post(
   }
 );
 
+// "==================== QUERY get bill BY CHAINCODE =================="
 app.get(
   "/channels/:channelName/chaincodes/:chaincodeName/getbill",
   async function (req, res) {
@@ -787,24 +840,24 @@ app.get(
 );
 
 //////////////////////////////////LATER USE FOR WALLLET ID GET REQUEST//////////////////////////////////
-app.get("/api/login", (req, res) => {
-  const filePath = `/home/lightyagami/fabric-samples/electricLadger/javascript/wallet/${req.query.name}.id`;
-  fs.access(filePath, fs.constants.F_OK, (error) => {
-    if (error) {
-      // The file was not found
-      res.status(404).send({ error: "User not found" });
-    } else {
-      // The file was found
-      fs.readFile(filePath, (error, data) => {
-        if (error) {
-          res.status(500).send({ error: "Error reading file" });
-        } else {
-          res.send(data);
-        }
-      });
-    }
-  });
-});
+// app.get("/api/login", (req, res) => {
+//   const filePath = `/home/lightyagami/fabric-samples/electricLadger/javascript/wallet/${req.query.name}.id`;
+//   fs.access(filePath, fs.constants.F_OK, (error) => {
+//     if (error) {
+//       // The file was not found
+//       res.status(404).send({ error: "User not found" });
+//     } else {
+//       // The file was found
+//       fs.readFile(filePath, (error, data) => {
+//         if (error) {
+//           res.status(500).send({ error: "Error reading file" });
+//         } else {
+//           res.send(data);
+//         }
+//       });
+//     }
+//   });
+// });
 
 // const fs = require("fs");
 
