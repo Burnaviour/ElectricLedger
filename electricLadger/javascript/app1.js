@@ -300,7 +300,7 @@ app.post("/admin/register", async function (req, res) {
   }
 });
 
-
+//######################################## Admin Login wallet File check #################################
 const multer = require('multer');
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -324,11 +324,22 @@ app.post("/api/verifyWallet", upload.single('file'), async function (req, res) {
   if (uploadedFileContent.toString() === walletFile.toString()) {
     console.log(username)
     const response_payload = { success: true, message: "Succesfully Verified " };
+    logger.debug("\nData send :", response_payload);
     res.status(200).send(response_payload);
+    fs.unlink(uploadedFile.path, (err) => {
+      if (err) throw err;
+      console.log(`${uploadedFile.path} was deleted`);
+    });
     return;
-  } else {
-    const response_payload = { success: false, message: 'File does not match' };
-    res.status(400).send(response_payload);
+  }
+  else {
+    const response_payload = { success: false, message: 'File does not match.Please provide correct wallet file to login ' };
+    logger.debug("\nData send :", response_payload);
+    res.send(response_payload);
+    fs.unlink(uploadedFile.path, (err) => {
+      if (err) throw err;
+      console.log(`${uploadedFile.path} was deleted`);
+    });
 
     return;
   }
@@ -478,7 +489,7 @@ app.post("/admin/login", async function (req, res) {
     });
   }
 });
-
+//"==================== INVOKE ON CHAINCODE =================="
 // Invoke transaction on chaincode on target peers
 app.post(
   "/channels/:channelName/chaincodes/:chaincodeName/invoke",
@@ -491,19 +502,19 @@ app.post(
       var chaincodeName = req.params.chaincodeName;
       var channelName = req.params.channelName;
       var fcn = req.body.fcn;
-      var name = req.body.name.trim();
-      var address = req.body.address.trim();
+      var name = req.body.name;
+      var address = req.body.address
       var units = req.body.units;
-      var cnic = req.body.cnic.trim();
+      var cnic = req.body.cnic;
       logger.debug("channelName  : " + channelName);
       logger.debug("chaincodeName : " + chaincodeName);
       logger.debug("fcn  : " + fcn);
       logger.debug("name  : " + name);
       logger.debug("address  : " + address);
       logger.debug("units  : " + units);
-      logger.debug("units  : " + cnic);
+      logger.debug("cnic  : " + cnic);
       if (!chaincodeName) {
-        console.log("coun1");
+
         res.json(getErrorMessage("'chaincodeName'"));
         return;
       }
@@ -515,23 +526,34 @@ app.post(
         res.json(getErrorMessage("'fcn'"));
         return;
       }
-      if (!cnic) {
+      if (!cnic.trim()) {
         res.json(getErrorMessage("'cnic'"));
         return;
       }
-      if (name.length === 0) {
-        res.json({
-          success: false,
-          message: "name" + " field is missing or Invalid in the request",
-        });
-        if (address.length === 0) {
-          res.json({
-            success: false,
-            message: "address" + "field is missing or Invalid in the request",
-          });
-        }
+      if (!address.trim()) {
+        res.json(getErrorMessage("'address'"));
         return;
       }
+      if (!name.trim()) {
+        res.json(getErrorMessage("'name'"));
+        return;
+      }
+      name = name.trim();
+      address = address.trim();
+      cnic = cnic.trim();
+      // if (name.length === 0) {
+      //   res.json({
+      //     success: false,
+      //     message: "name" + " field is missing or Invalid in the request",
+      //   });
+      //   if (address.length === 0) {
+      //     res.json({
+      //       success: false,
+      //       message: "address" + "field is missing or Invalid in the request",
+      //     });
+      //   }
+      //   return;
+      // }
 
       let message = await invoke.invokeTransaction(
         channelName,
@@ -561,7 +583,7 @@ app.post(
     }
   }
 );
-
+// "==================== QUERY BY CHAINCODE =================="
 app.get(
   "/channels/:channelName/chaincodes/:chaincodeName",
   async function (req, res) {
@@ -704,8 +726,9 @@ app.post(
         error: null,
         errorData: null,
       };
-
+      logger.debug("Data Send Sccess  : ", response_payload);
       res.send(response_payload);
+      return;
     } else {
       const response_payload = {
         result: message,
@@ -714,7 +737,9 @@ app.post(
         message: "there was an error while doing transaction ",
         errorData: null,
       };
+      logger.debug("Data Send failed  : ", response_payload);
       res.send(response_payload);
+      return;
     }
   }
 );
