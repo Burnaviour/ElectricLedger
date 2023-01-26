@@ -349,6 +349,7 @@ app.post("/api/verifyWallet", upload.single('file'), async function (req, res) {
 });
 
 // Login and get jwt
+
 app.post("/users/login", async function (req, res) {
   var username = req.body.username;
   var orgName = req.body.orgName;
@@ -541,20 +542,6 @@ app.post(
       name = name.trim();
       address = address.trim();
       cnic = cnic.trim();
-      // if (name.length === 0) {
-      //   res.json({
-      //     success: false,
-      //     message: "name" + " field is missing or Invalid in the request",
-      //   });
-      //   if (address.length === 0) {
-      //     res.json({
-      //       success: false,
-      //       message: "address" + "field is missing or Invalid in the request",
-      //     });
-      //   }
-      //   return;
-      // }
-
       let message = await invoke.invokeTransaction(
         channelName,
         chaincodeName,
@@ -583,6 +570,111 @@ app.post(
     }
   }
 );
+
+//#######################invoke update user data chaincode 
+app.post(
+  "/channels/:channelName/chaincodes/:chaincodeName/invokeuserdata",
+  async function (req, res) {
+    try {
+      logger.debug(
+        "==================== INVOKE ON CHAINCODE =================="
+      );
+
+      var chaincodeName = req.params.chaincodeName;
+      var channelName = req.params.channelName;
+      var fcn = req.body.fcn;
+      var name = req.body.name;
+      var address = req.body.address
+      var cnic = req.body.cnic;
+      var uid = req.body.uid;
+      logger.debug("channelName  : " + channelName);
+      logger.debug("chaincodeName : " + chaincodeName);
+      logger.debug("fcn  : " + fcn);
+      logger.debug("name  : " + name);
+      logger.debug("address  : " + address);
+      logger.debug("cnic  : " + cnic);
+      logger.debug("uid  : " + uid);
+      if (!chaincodeName) {
+
+        res.json(getErrorMessage("'chaincodeName'"));
+        return;
+      }
+      if (!channelName) {
+        res.json(getErrorMessage("'channelName'"));
+        return;
+      }
+      if (!uid) {
+        res.json(getErrorMessage("'uid'"));
+        return;
+      }
+      if (!fcn) {
+        res.json(getErrorMessage("'fcn'"));
+        return;
+      }
+      if (!cnic.trim()) {
+        res.json(getErrorMessage("'cnic'"));
+        return;
+      }
+      if (!address.trim()) {
+        res.json(getErrorMessage("'address'"));
+        return;
+      }
+      if (!name.trim()) {
+        res.json(getErrorMessage("'name'"));
+        return;
+      }
+      name = name.trim();
+      address = address.trim();
+      cnic = cnic.trim();
+      uid = uid.trim();
+      let prevData = await query.query(
+        "mychannel",
+        "electricLadger",
+        uid,
+        "queryData",
+        "appUser",
+        "Org1"
+      );
+      if (prevData[0]) {
+
+        if (prevData[0].key === uid) {
+          let message = await invoke.invokeUpdateData(
+            channelName,
+            chaincodeName,
+            fcn,
+            [name, address, cnic, prevData[0].value.units, uid],
+            req.username,
+            req.orgname
+          );
+          let response = {
+            success: true,
+            result: message.result,
+            message: message.message
+          };
+          res.json(response)
+          return
+
+        }
+      }
+      let response = {
+        success: false,
+        message: uid + " not found.Please check your given Uid!",
+      };
+      res.json(response)
+      return;
+    } catch (error) {
+      const response_payload = {
+        result: null,
+        success: false,
+        error: error.name,
+        errorData: error.message,
+      };
+      res.send(response_payload);
+    }
+  }
+);
+
+
 // "==================== QUERY BY CHAINCODE =================="
 app.get(
   "/channels/:channelName/chaincodes/:chaincodeName",
