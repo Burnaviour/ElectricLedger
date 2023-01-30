@@ -261,7 +261,7 @@ const invokeUpdateData = async (
         Buffer.from(JSON.stringify(users))
       );
 
-      message = `Successfully updated the assests of name ${args[0]
+      message = `Successfully updated the assets of name ${args[0]
         }`;
     } else {
       return `Invocation require either writeData as function but got ${fcn}`;

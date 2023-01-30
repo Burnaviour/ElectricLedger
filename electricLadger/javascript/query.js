@@ -65,7 +65,7 @@ async function queryData(
     // const result = await contract.evaluateTransaction('queryData',myquery);
     let result = await contract.evaluateTransaction(fcn, args);
     console.log(
-      `Transaction has been evaluated, result is: ${result + "here"}`
+      `Transaction has been evaluated, result is: ${result}`
     );
 
     result = JSON.parse(result.toString());

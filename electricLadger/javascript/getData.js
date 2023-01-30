@@ -16,7 +16,9 @@ const getData = function (message, message1) {
       currentUsage += arr[i];
     }
     if (message1) {
-      var tax = Math.round((currentUsage * message1[0].value.unitPrice) * message1[0].value.tax);
+      var tax = Math.round((currentUsage * message1[0].value.unitPrice) * (message1[0].value.tax / 100));
+      console.log("tax percent ", message1[0].value.tax / 100)
+      console.log("tax ", tax)
       monthlyBill =
         (currentUsage * message1[0].value.unitPrice) + tax +
         message1[0].value.servicesCharges;

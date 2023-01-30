@@ -388,6 +388,7 @@ app.post("/users/login", async function (req, res) {
       "appUser",
       "Org1"
     );
+    //to show prices on user dashboard
     let prices = await query.query(
       "mychannel",
       "electricLadger",
@@ -571,7 +572,7 @@ app.post(
   }
 );
 
-//#######################invoke update user data chaincode 
+//#######################invoke update user data chaincode ###################
 app.post(
   "/channels/:channelName/chaincodes/:chaincodeName/invokeuserdata",
   async function (req, res) {
@@ -579,7 +580,6 @@ app.post(
       logger.debug(
         "==================== INVOKE ON CHAINCODE =================="
       );
-
       var chaincodeName = req.params.chaincodeName;
       var channelName = req.params.channelName;
       var fcn = req.body.fcn;
@@ -635,6 +635,8 @@ app.post(
         "appUser",
         "Org1"
       );
+
+
       if (prevData[0]) {
 
         if (prevData[0].key === uid) {
@@ -651,9 +653,9 @@ app.post(
             result: message.result,
             message: message.message
           };
+          logger.debug(`successfully updated user ${name}'s data `);
           res.json(response)
-          return
-
+          return;
         }
       }
       let response = {
@@ -670,6 +672,8 @@ app.post(
         errorData: error.message,
       };
       res.send(response_payload);
+      logger.debug(`got error ${error} `);
+      return
     }
   }
 );
