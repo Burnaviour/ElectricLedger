@@ -2,7 +2,7 @@
 
 const { Contract } = require("fabric-contract-api");
 
-class ElectricLadger extends Contract {
+class ElectricLedger extends Contract {
   // async initLedger(ctx) {
 
   // const users = [
@@ -208,4 +208,4 @@ class ElectricLadger extends Contract {
   }
 }
 
-module.exports = ElectricLadger;
+module.exports = ElectricLedger;

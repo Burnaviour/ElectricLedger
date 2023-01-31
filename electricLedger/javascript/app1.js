@@ -17,7 +17,7 @@ const constants = require("./config/constants.json");
 const host = process.env.HOST || constants.host;
 const port = process.env.PORT || constants.port;
 const log4js = require("log4js");
-var logger = log4js.getLogger("electricLadger");
+var logger = log4js.getLogger("electricledger");
 const helper = require("./helper");
 const query = require("./query");
 const getData = require("./getData");
@@ -141,7 +141,7 @@ app.post("/register", async function (req, res) {
   if (type === "user") {
     let message = await query.query(
       "mychannel",
-      "electricLadger",
+      "electricledger",
       uid,
       "queryData",
       "appUser",
@@ -382,7 +382,7 @@ app.post("/users/login", async function (req, res) {
   if (type === "user") {
     let message = await query.query(
       "mychannel",
-      "electricLadger",
+      "electricledger",
       uid,
       "queryData",
       "appUser",
@@ -391,7 +391,7 @@ app.post("/users/login", async function (req, res) {
     //to show prices on user dashboard
     let prices = await query.query(
       "mychannel",
-      "electricLadger",
+      "electricledger",
       "unitPrices",
       "queryData",
       "appUser",
@@ -629,7 +629,7 @@ app.post(
       uid = uid.trim();
       let prevData = await query.query(
         "mychannel",
-        "electricLadger",
+        "electricledger",
         uid,
         "queryData",
         "appUser",
@@ -962,7 +962,7 @@ app.get(
 
 //////////////////////////////////LATER USE FOR WALLLET ID GET REQUEST//////////////////////////////////
 // app.get("/api/login", (req, res) => {
-//   const filePath = `/home/lightyagami/fabric-samples/electricLadger/javascript/wallet/${req.query.name}.id`;
+//   const filePath = `/home/lightyagami/fabric-samples/electricledger/javascript/wallet/${req.query.name}.id`;
 //   fs.access(filePath, fs.constants.F_OK, (error) => {
 //     if (error) {
 //       // The file was not found

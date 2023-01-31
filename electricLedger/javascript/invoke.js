@@ -42,7 +42,7 @@ var logger = log4js.getLogger();
 //         const network = await gateway.getNetwork('mychannel');
 
 //         // Get the contract from the network.
-//         const contract = network.getContract('electricLadger');
+//         const contract = network.getContract('electricledger');
 
 //         // Submit the specified transaction.
 //         const users = [
@@ -352,7 +352,7 @@ const invokeMeterUnits = async (
     const network = await gateway.getNetwork("mychannel");
 
     // Get the contract from the network.
-    const contract = network.getContract("electricLadger");
+    const contract = network.getContract("electricledger");
 
     // edit or add propert
 
