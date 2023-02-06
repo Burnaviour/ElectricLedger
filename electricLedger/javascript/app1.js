@@ -411,11 +411,19 @@ app.post("/users/login", async function (req, res) {
           },
           app.get("secret")
         );
+
         let isUserRegistered = await helper.isUserRegistered(username, orgName);
 
         //Register the user, enroll the user, and import the new identity into the wallet.
         if (isUserRegistered) {
-          res.json({ success: true, token: token, username: username, orgName: orgName, prices: prices[0].value });
+          let history = await query.queryHistoruData(
+            "mychannel",
+            "electricledger",
+            uid,
+            username,
+            "Org1"
+          );
+          res.json({ success: true, token: token, username: username, orgName: orgName, prices: prices[0].value, history: history, result: message });
           return;
         } else {
           logger.debug(`user ${username} does not exist `);
