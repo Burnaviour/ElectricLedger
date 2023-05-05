@@ -49,7 +49,7 @@ const getAffiliation = async (org) => {
 const isUserRegistered = async (username, userOrg) => {
   const walletPath = await getWalletPath(userOrg);
   const wallet = await Wallets.newFileSystemWallet(walletPath);
-  console.log(`Wallet path: ${walletPath}`);
+  // console.log(`Wallet path: ${walletPath}`);
 
   const userIdentity = await wallet.get(username);
   if (userIdentity) {
@@ -67,7 +67,7 @@ const getRegisteredUser = async (username, userOrg, isJson) => {
 
   const walletPath = await getWalletPath(userOrg);
   const wallet = await Wallets.newFileSystemWallet(walletPath);
-  console.log(`Wallet path: ${walletPath}`);
+  // console.log(`Wallet path: ${walletPath}`);
 
   const userIdentity = await wallet.get(username);
   if (userIdentity) {

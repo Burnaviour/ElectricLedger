@@ -1,25 +1,40 @@
 const invoke = require("./invoke");
-// Initialize the units to 0
+const grid = require("./unit_updater");
+const log4js = require('log4js');
 
+// configure logger
+log4js.configure({
+  appenders: { console: { type: 'console' } },
+  categories: { default: { appenders: ['console'], level: 'info' } }
+});
 // Set the update interval to 2 minutes (120000 milliseconds)
 const updateInterval = 5000;
-
+const logger = log4js.getLogger();
 // Run the update loop
 setInterval(async function () {
   // Increase the units by a random amount
   let units = 0;
-  units += Math.floor(Math.random() * 10);
-  let message = await invoke.invokeMeterUnits(
-    "mycahnnel",
-    "electricledger",
-    "writeData",
-    ["Ali", "korangi", units, "35201-35202"],
-    "appUser",
-    "Org1",
-    "uid0"
-  );
+  units += Math.floor(Math.random() * 8);
+  if (grid.consumeUnits(units, "uid1")) {
+
+    var message = await invoke.invokeMeterUnits(
+      "mycahnnel",
+      "electricledger",
+      "writeData",
+      ["moiz", "malir cent", units, "35201-35203"],
+      "appUser",
+      "Org1",
+      "uid1"
+    );
+    // Log the updated units
+    logger.info(`Units Consumed Today: ${message}`);
 
 
-  // Log the updated units
-  console.log(`Updated units: ${message}`);
+  } else { logger.info("Grid is under development cannot update units") }
+
+
+
+
 }, updateInterval);
+
+

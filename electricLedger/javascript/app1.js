@@ -938,12 +938,12 @@ app.get(
           "Org1"
         );
 
-        // console.log(message);
+        console.log(message1);
         // console.log(message);
         console.log("result Here")
         let result = message && message1 && getData.getData(message, message1);
 
-        console.log("got tax");
+        // console.log("got tax");
         if (result) {
           const response_payload = {
             success: true,
@@ -953,7 +953,7 @@ app.get(
             result: result,
             unitPrice: message1[0].value.unitPrice,
             ServiceCharges: message1[0].value.servicesCharges,
-            tax: result.tax,
+            tax: message1[0].value.tax,
             error: null,
             errorData: null,
             Ishistory: true,
