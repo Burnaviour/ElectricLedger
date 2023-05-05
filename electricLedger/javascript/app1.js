@@ -896,6 +896,7 @@ app.get(
           errorData: null,
         };
         res.send(response_payload);
+        return;
       }
 
       if (history === "true") {
@@ -908,6 +909,18 @@ app.get(
           "Org1"
         );
 
+        if (!message2[0]) {
+          const response_payload = {
+            success: false,
+            result: "user not Found Please Enter valid user id ",
+            error: null,
+            errorData: null,
+            Ishistory: true,
+          };
+          console.log(response_payload);
+          res.send(response_payload);
+          return;
+        }
         let message1 = await query.query(
           channelName,
           chaincodeName,
@@ -916,6 +929,7 @@ app.get(
           req.username,
           "Org1"
         );
+
         let message = await query.queryHistoruData(
           channelName,
           chaincodeName,
@@ -923,11 +937,14 @@ app.get(
           req.username,
           "Org1"
         );
+        // Buffer.from(JSON.stringify(users))
         // console.log(message);
-        // console.log(message1);
+        // console.log(message);
+        console.log("result Here")
         let result = message && message1 && getData.getData(message, message1);
+
+        console.log("got tax");
         if (result) {
-          console.log(result);
           const response_payload = {
             success: true,
             uid: message2[0].key,
@@ -941,8 +958,9 @@ app.get(
             errorData: null,
             Ishistory: true,
           };
-
+          console.log("DONE WITH TRANSCATION response_payload");
           res.send(response_payload);
+          return;
         } else {
           const response_payload = {
             success: false,
@@ -953,9 +971,9 @@ app.get(
           };
           console.log(response_payload);
           res.send(response_payload);
+          return;
         }
 
-        return;
       }
     } catch (error) {
       const response_payload = {
@@ -964,6 +982,7 @@ app.get(
         errorData: error.message,
       };
       res.send(response_payload);
+      return;
     }
   }
 );

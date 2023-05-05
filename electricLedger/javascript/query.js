@@ -4,6 +4,7 @@ const { Gateway, Wallets } = require("fabric-network");
 const path = require("path");
 const fs = require("fs");
 const helper = require("./helper");
+const { Console } = require("console");
 
 // async function main(){
 //    // load the network configuration
@@ -126,6 +127,7 @@ async function queryHistory(
     result = JSON.parse(result.toString());
     // Disconnect from the gateway.
     await gateway.disconnect();
+    console.log("DONW WITHH TRANS");
     return result;
   } catch (error) {
     console.error(`Failed to evaluate transaction: ${error}`);

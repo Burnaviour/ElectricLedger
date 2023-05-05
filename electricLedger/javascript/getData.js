@@ -1,7 +1,8 @@
 const getData = function (message, message1) {
   let currentUsage = 0;
   let monthlyBill = 0;
-
+  let isMonthly = false;
+  let MonthlyUsage = 0;
 
   if (message) {
     let arr = message.map((item) => item.Value.units);
@@ -12,11 +13,24 @@ const getData = function (message, message1) {
     console.log("index after mod", arr.length % 30);
 
     let index = arr.length % 30;
+    if (arr.length > 30) {
+      isMonthly = true;
+      for (let i = index; i < index + 30; i++) {
+        currentUsage += arr[i];
+      }
 
-    for (let i = 0; i < index; i++) {
-      currentUsage += arr[i];
+      for (let i = 0; i < index; i++) {
+        MonthlyUsage += arr[i];
+      }
+
     }
-    if (message1) {
+    else {
+      for (let i = 0; i < index; i++) {
+        MonthlyUsage += arr[i];
+      }
+    }
+
+    if (isMonthly) {
       var unitPrice = Number(message1[0].value.unitPrice);
       var taxGST = Number(message1[0].value.tax);
       var tax = Math.round((currentUsage * unitPrice) * (taxGST / 100));
@@ -26,15 +40,20 @@ const getData = function (message, message1) {
       monthlyBill =
         (currentUsage * unitPrice) + tax + servicesCharges;
     }
-    console.log("currentUsage", typeof currentUsage)
-    console.log("currentUsage*unitPrice", typeof unitPrice)
-    console.log("service charges", typeof servicesCharges)
+
 
   }
 
-  let data = { monthlyUnits: currentUsage, monthlyBill: monthlyBill, tax: tax };
-  console.log(data);
-  return data;
+  if (isMonthly) {
+
+    let data = { monthlyUnits: currentUsage, isMonthly: true, monthlyBill: monthlyBill, tax: tax, CurrentUsage: MonthlyUsage };
+    return data;
+  } else {
+
+    let data = { CurrentUsage: MonthlyUsage, isMonthly: false };
+
+    return data;
+  }
 };
 
 module.exports = {
